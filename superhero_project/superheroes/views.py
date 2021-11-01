@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, request
 from django.urls import reverse
 from .models import Superhero
+from django.http import HttpResponse, HttpResponseRedirect, request
 
 # Create your views here.
 def index(request):
@@ -18,6 +19,7 @@ def detail(request, hero_id):
    }
    return render(request, 'superheroes/detail.html',  context)
 
+
 def create(request):
     if request.method == "POST":
         #save the form contents as a new db object
@@ -32,3 +34,41 @@ def create(request):
         return HttpResponseRedirect(reverse('superheroes:index'))
     else:
         return render(request, 'superheroes/create.html')
+
+def edit(request, hero_id):
+    edit_hero = Superhero.objects.get(pk=hero_id)
+    context = {
+            'edit_hero': edit_hero
+    }
+        # save the form contents as a new db object
+        # return to index
+
+    if request.method == "POST":
+        hero_id = hero_id
+        name = request.POST.get('name')
+        alter_ego = request.POST.get('alter_ego')
+        primary = request.POST.get('primary')
+        secondary = request.POST.get('secondary')
+        catchphrase = request.POST.get('catchphrase')
+        edit_hero = Superhero.objects.get(pk = hero_id)
+        edit_hero.save()
+        return HttpResponseRedirect(reverse('superheroes:index'))
+    else:
+        return render(request, 'superheroes/edit.html', context = context)
+             
+def delete(request,hero_id):
+    remove_hero = Superhero.objects.get(pk=hero_id)
+    context = {
+        'remove_hero': remove_hero
+    }
+    if request.method == "POST":
+        name = request.POST.get('name')
+        alter_ego = request.POST.get('alter_ego')
+        primary = request.POST.get('primary')
+        secondary = request.POST.get('secondary')
+        catchphrase = request.POST.get('catchphrase')
+        remove_hero = Superhero(name=name, alter_ego=alter_ego,primary_ability=primary,secondary_ability=secondary,catch_phrase=catchphrase)
+        remove_hero.delete()
+        return HttpResponseRedirect(reverse('superheroes:index'))
+    else:
+        return render(request,'superheroes/update.html',context)
